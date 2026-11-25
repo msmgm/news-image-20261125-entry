@@ -38,6 +38,14 @@ if (isPng) {
   if (buf.length < 24) {
     throw new Error('PNG file is shorter than 24 bytes');
   }
+  if (
+    buf[12] !== 0x49 ||
+    buf[13] !== 0x48 ||
+    buf[14] !== 0x44 ||
+    buf[15] !== 0x52
+  ) {
+    throw new Error('PNG bytes 12 to 15 do not spell IHDR');
+  }
   width = buf.readUInt32BE(16);
   height = buf.readUInt32BE(20);
 } else if (isJpeg) {
@@ -93,6 +101,10 @@ if (isPng) {
   }
 } else {
   throw new Error('Unknown image format');
+}
+
+if (width === 0 || height === 0) {
+  throw new Error('Image width or height cannot be zero: ' + width + 'x' + height);
 }
 
 if (width > 1024 || height > 1024) {
